@@ -41,3 +41,6 @@ bin/
 
 # Windows
 Thumbs.db
+
+# Fabric API 本地依赖（体积较大，按 README 说明自备或改用 maven 依赖）
+libs/

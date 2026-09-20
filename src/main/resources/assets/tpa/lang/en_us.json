@@ -1,0 +1,21 @@
+{
+  "tpa.usage.tpa": "Usage: /tpa <player>",
+  "tpa.error.player_only": "Only players can use this command",
+  "tpa.error.not_online": "Player \"%s\" is not online or does not exist",
+  "tpa.error.self": "You cannot teleport to yourself",
+  "tpa.error.already_pending": "You already have a pending teleport request; use /tpacancel to cancel it",
+  "tpa.error.no_pending": "You have no pending teleport request",
+  "tpa.error.requester_offline": "The requester is offline",
+  "tpa.message.sent": "Sent a teleport request to %s",
+  "tpa.message.expires_hint": "The request expires in 60 seconds; use /tpacancel to cancel",
+  "tpa.message.received": "%s wants to teleport to you",
+  "tpa.message.hint": "Type /tpaccept to accept, or /tpdeny to deny",
+  "tpa.message.accepted_requester": "You have teleported to %s",
+  "tpa.message.accepted_target": "%s has teleported to you",
+  "tpa.message.denied": "You denied the teleport request",
+  "tpa.message.denied_requester": "%s denied your teleport request",
+  "tpa.message.cancelled": "Teleport request cancelled",
+  "tpa.message.cancelled_target": "%s cancelled the teleport request",
+  "tpa.message.expired": "Your teleport request has expired",
+  "tpa.message.expired_target": "The teleport request sent to you has expired"
+}

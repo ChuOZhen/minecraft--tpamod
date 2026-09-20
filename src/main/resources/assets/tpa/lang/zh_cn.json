@@ -1,0 +1,21 @@
+{
+  "tpa.usage.tpa": "用法：/tpa <玩家名>",
+  "tpa.error.player_only": "只有玩家可以使用此命令",
+  "tpa.error.not_online": "玩家「%s」不在线或不存在",
+  "tpa.error.self": "你不能传送到自己",
+  "tpa.error.already_pending": "你已有一个待处理的传送请求，可用 /tpacancel 取消",
+  "tpa.error.no_pending": "你没有待处理的传送请求",
+  "tpa.error.requester_offline": "请求者已离线",
+  "tpa.message.sent": "已向 %s 发送传送请求",
+  "tpa.message.expires_hint": "请求将在 60 秒后过期，可用 /tpacancel 取消",
+  "tpa.message.received": "%s 想传送到你这里",
+  "tpa.message.hint": "输入 /tpaccept 接受，或 /tpdeny 拒绝",
+  "tpa.message.accepted_requester": "你已传送到 %s 身边",
+  "tpa.message.accepted_target": "%s 已传送到你身边",
+  "tpa.message.denied": "你拒绝了传送请求",
+  "tpa.message.denied_requester": "%s 拒绝了你的传送请求",
+  "tpa.message.cancelled": "已取消传送请求",
+  "tpa.message.cancelled_target": "%s 取消了传送请求",
+  "tpa.message.expired": "你发出的传送请求已过期",
+  "tpa.message.expired_target": "发给你的传送请求已过期"
+}

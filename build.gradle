@@ -1,5 +1,5 @@
-，wuxplugins {
-    id 'fabric-loom' version '1.9-SNAPSHOT'
+plugins {
+    id 'fabric-loom' version '1.18.2'
     id 'maven-publish'
 }
 
@@ -11,64 +11,88 @@ base {
 }
 
 repositories {
-    // 国内镜像（优先）
-    maven { url 'https://maven.aliyun.com/repository/public' }
-    maven { url 'https://maven.aliyun.com/repository/google' }
-    maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
-
-    // 原版仓库
-    mavenCentral()
-    maven { url "https://maven.fabricmc.net/" }
+    // 无需额外仓库：Fabric API 以本地模块 jar 提供（原因见 dependencies 中的说明）
 }
 
 dependencies {
-    // Minecraft和Fabric Loader
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+
+    // 恒等映射（identity mappings）
+    // 26.3 没有可用的 Yarn 映射：meta 接口对 26.3 返回空数组，官方版本清单 26.3.json
+    // 也没有 client_mappings 字段。而本环境的 Minecraft 26.3 客户端 jar 本身即为
+    // 「命名版」（jar 内可直接看到 net/minecraft/... 的真实类名），Fabric API 同套命名，
+    // 因此这里使用恒等映射，源码按 Mojang 名（命名版）书写。
+    // 必须是 jar 形式（内含 mappings/mappings.tiny）：Loom 用 TinyJarInfo 读取 mappings jar，
+    // 直接给裸 .tiny 文件会以 "Provider \"jar\" not found" 失败。
+    mappings files('gradle/identity-mappings.jar')
+
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    // Fabric API
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    // Fabric API：改用本地文件依赖，避免 Loom 的 mod remap 改写 classTweaker 的命名空间。
+    // 聚合 jar 内的 *.classtweaker 声明的是 official 命名空间，而 Loom 在 dev 环境会改写成
+    // named，与本环境 Loader 的运行时命名空间（official）不一致，启动时会以
+    //   "Namespace (named) does not match current runtime namespace (official)"
+    // 直接崩溃。走普通 implementation（非 mod 配置）可保持文件原样；Loader 依然会从
+    // classpath 扫描到这些模组。
+    // 注意用 fileTree 指向「解压后的模块 jar」：聚合 jar 的真正类在 META-INF/jars/*.jar
+    // （嵌套 jar），javac 不会读取嵌套 jar，直接依赖聚合 jar 会编译失败。
+    implementation fileTree(dir: 'libs/fabric-api-modules', include: '*.jar')
 }
 
 processResources {
-    inputs.property "version", project.version
-    inputs.property "minecraft_version", project.minecraft_version
-    inputs.property "loader_version", project.loader_version
-    filteringCharset "UTF-8"
+    inputs.property 'version', project.version
+    inputs.property 'loader_version', project.loader_version
+    inputs.property 'minecraft_version', project.minecraft_version
 
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version,
-                "minecraft_version": project.minecraft_version,
-                "loader_version": project.loader_version
+    filesMatching('fabric.mod.json') {
+        expand(
+                'version': project.version,
+                'loader_version': project.loader_version,
+                'minecraft_version': project.minecraft_version
+        )
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.encoding = "UTF-8"
-    it.options.release = 21
+    it.options.encoding = 'UTF-8'
+    // Minecraft 26.3 要求的 Java 版本为 25
+    it.options.release = 25
 }
 
 java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+
     withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
-    from("LICENSE") {
-        rename { "${it}_${project.base.archivesName.get()}"}
+    from('LICENSE') {
+        rename { "${it}_${project.archives_base_name}" }
     }
 }
 
-// 配置发布
 publishing {
     publications {
-        create("mavenJava", MavenPublication) {
-            from components.java
+        create('mavenJava', MavenPublication) {
+            artifact(remapJar) {
+                builtBy remapJar
+            }
+            artifact(sourcesJar) {
+                builtBy sourcesJar
+            }
         }
     }
     repositories {
-        // 根据需要添加
+        // 发布目标按需配置
     }
+}
+
+// ---------------------------------------------------------------------------
+// 恒等映射的映射树中没有 intermediary 条目，Loom 的 remapSourcesJar 会报：
+//   "Could not find namespace \"intermediary\" in provided tiny tree"
+// 因此关闭该任务。主 jar（remapJar）不受影响。
+// ---------------------------------------------------------------------------
+tasks.matching { it.name == 'remapSourcesJar' }.configureEach {
+    enabled = false
 }
