@@ -1,6 +1,8 @@
 # Gradle
 .gradle/
 build/
+# Loom 的 dev 运行目录（runServer/runClient 生成的世界、配置、日志）
+run/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/

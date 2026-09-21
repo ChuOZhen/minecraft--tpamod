@@ -22,7 +22,7 @@ if %errorlevel% equ 0 (
     echo ========================================
     echo.
     echo 生成的JAR文件位置:
-    echo   build\libs\tpa-1.0.0.jar
+    echo   build\libs\tpa-2.1.0.jar
     echo.
     echo 请将JAR文件复制到服务器的 mods 文件夹中
     echo.
